@@ -69,6 +69,8 @@ class Contracts(unittest.TestCase):
         error = Zcode().classify_failure(
             "Error: Model creation failed\nCause: Error: Select a model before continuing")
         self.assertEqual(error.code, "model_selection_unavailable")
+        self.assertEqual(Zcode().classify_failure("Error: Model creation failed").code,
+                         "model_creation_failed")
         self.assertIsNone(Zcode().classify_failure("generic worker error"))
 
     def test_zcode_readonly_rejected(self):
@@ -81,6 +83,8 @@ class Contracts(unittest.TestCase):
         args = Zcode().invocation(task, {}, ["runtime", "cli"], {}).command
         self.assertEqual(args[args.index("--mode") + 1], "edit")
         self.assertNotIn("yolo", args)
+        self.assertIn("--json", args)
+        self.assertNotIn("--output-format", args)
         self.assertNotIn("--verbose", args)
         verbose_args = Zcode().invocation(
             task, {"verbose": True}, ["runtime", "cli"], {}).command
@@ -99,6 +103,20 @@ class Contracts(unittest.TestCase):
         with self.assertRaises(DispatchError):
             Zcode().invocation(
                 task, {"builtin_provider_config_file": "missing.json"}, ["runtime"], {})
+
+    def test_zcode_discovers_moved_builtin_provider_file(self):
+        task = Task("zcode", "inspect", str(ROOT), mode="write", allowed_paths=["a"])
+        with tempfile.TemporaryDirectory() as directory:
+            resources = Path(directory)
+            entry = resources / "glm" / "zcode.cjs"
+            entry.parent.mkdir()
+            entry.write_text("", encoding="utf-8")
+            provider = resources / "config" / "provider" / "zcode-builtin.json"
+            provider.parent.mkdir(parents=True)
+            provider.write_text("{}", encoding="utf-8")
+            invocation = Zcode().invocation(task, {}, ["node", str(entry)], {})
+            self.assertEqual(invocation.env["ZCODE_BUILTIN_PROVIDER_CONFIG_FILE"],
+                             str(provider))
 
     def test_dsh_env_scoped(self):
         env = {"ORIGINAL": "yes"}

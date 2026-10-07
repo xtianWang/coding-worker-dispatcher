@@ -22,8 +22,17 @@ class Zcode:
                 raise DispatchError("invalid_config",
                                     "Configured ZCode built-in provider config file does not exist.")
             env = {**env, "ZCODE_BUILTIN_PROVIDER_CONFIG_FILE": provider_config}
+        elif "ZCODE_BUILTIN_PROVIDER_CONFIG_FILE" not in env:
+            for part in command:
+                entry = Path(part)
+                if entry.name != "zcode.cjs" or entry.parent.name != "glm":
+                    continue
+                candidate = entry.parent.parent / "config" / "provider" / "zcode-builtin.json"
+                if candidate.is_file():
+                    env = {**env, "ZCODE_BUILTIN_PROVIDER_CONFIG_FILE": str(candidate)}
+                break
         args = [*command, "--prompt", task.prompt, "--cwd", task.cwd,
-                "--mode", "edit", "--output-format", "json", "--no-color"]
+                "--mode", "edit", "--json", "--no-color"]
         if settings.get("verbose", False):
             args.append("--verbose")
         return Invocation(args, "", env)
@@ -46,5 +55,10 @@ class Zcode:
             return DispatchError(
                 "model_selection_unavailable",
                 "ZCode headless CLI did not provide a model selection; the dispatcher has no supported CLI option to choose one.",
+            )
+        if "Model creation failed" in stderr:
+            return DispatchError(
+                "model_creation_failed",
+                "ZCode could not create a model. Check its CLI model/provider setup; use verbose diagnostics privately for the underlying cause.",
             )
         return None

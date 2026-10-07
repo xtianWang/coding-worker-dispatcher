@@ -11,8 +11,9 @@ The first invocation exposed a nested turn-reason parsing bug; the fix passed
 the offline suite and the successful follow-up invocation. This verifies this
 connectivity scenario, not filesystem isolation or general task correctness.
 ZCode 0.16.9 started through the dispatcher but failed before producing a result
-with `Select a model before continuing`; the adapter now reports this as
-`model_selection_unavailable`. Nothing is published or installed automatically.
+with `Select a model before continuing`. The adapter reports
+`model_selection_unavailable` when that cause is visible in verbose output and
+`model_creation_failed` for the shorter default error. Nothing is installed automatically.
 
 ## What works
 
@@ -109,8 +110,10 @@ Exit codes: 0 protocol completion/handoff, 2 rejection, 3 failure, 4 timeout,
 | codex | not applicable | no subprocess | return to primary agent |
 
 The tested ZCode 0.16.9 headless `--prompt` path returned `Select a model before
-continuing`, even though the desktop app could chat. The dispatcher reports this
-as `model_selection_unavailable`; model selection must be fixed in ZCode's CLI.
+continuing`, even though the desktop app could chat. Using the documented
+`--surface desktop` option and the current built-in provider config path did not
+resolve it. The dispatcher uses ZCode's documented `--json` flag, but cannot
+select a model on the user's behalf; that requires a supported ZCode CLI path.
 The same headless symptom is tracked in the [Z.AI feedback issue #744](https://github.com/zai-org/feedback/issues/744).
 
 DSH Desktop's native launch path and ZCode's Node bundle have passed help/version
@@ -144,12 +147,14 @@ DSH Windows workspace-write can leave standing ACL/integrity-label changes;
 initial real tests must use a disposable, dedicated workspace.
 
 ZCode installations can place the CLI's built-in provider config at different
-locations. If discovery fails to locate it, set `builtin_provider_config_file`
+locations. For a `resources/glm/zcode.cjs` command, the adapter checks the current
+`resources/config/provider/zcode-builtin.json` layout. If that is not found, set `builtin_provider_config_file`
 under `[workers.zcode]` in your private config. The dispatcher passes this path
 through ZCode's `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` override; keep local config
 files out of version control. Set `verbose = true` there when diagnosing CLI
 errors, or pass `--verbose` to the opt-in smoke script. Verbose output may contain
 sensitive diagnostic details; the dispatcher's output masking is best effort.
+Finding the built-in provider file does not itself select a model for headless runs.
 
 ## Testing and contributing
 
