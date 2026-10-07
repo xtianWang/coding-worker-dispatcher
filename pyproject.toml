@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coding-worker-dispatcher"
+version = "0.1.0"
+description = "Explicit local coding-worker dispatch with bounded execution and Git evidence."
+requires-python = ">=3.11"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+
+[project.scripts]
+cwdispatch = "coding_worker_dispatcher.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+coding_worker_dispatcher = ["workers/*.yml"]

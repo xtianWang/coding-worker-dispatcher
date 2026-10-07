@@ -1,0 +1,31 @@
+# Copy to the user config directory or use --config with a trusted local file.
+# No personal installation paths or credentials belong in this repository.
+external_dispatch = false
+allowed_roots = []
+max_timeout_seconds = 300
+max_output_bytes = 1048576
+
+[workers.dsh]
+enabled = false
+allow_write = false
+accept_provider_policy = false
+# Empty command uses read-only PATH / standard Desktop discovery.
+command = []
+# Portable CLI example: command = ["dsh"]
+# Desktop example: command = ["<native-executable>", "--expose-internals", "<cli-entrypoint>"]
+# Set electron = true only for the Electron Desktop runtime.
+electron = false
+profile = "headless"
+env_allowlist = []
+# patch = "<absolute-path-to-reviewed-profile-overlay>"
+
+[workers.zcode]
+enabled = false
+allow_write = false
+accept_provider_policy = false
+command = []
+# command = ["node", "<absolute-path-to-zcode.cjs>"]
+env_allowlist = []
+# verbose = false
+# Optional absolute path for installations with a nonstandard bundled-config layout.
+# builtin_provider_config_file = "<absolute-path-to-zcode-builtin.json>"

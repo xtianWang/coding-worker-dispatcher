@@ -1,0 +1,10 @@
+# Applied after the selected DSH profile and all user-supplied overlays.
+# Keep the dispatcher single-worker: no DSH subagent spawn, fork or control tools.
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
