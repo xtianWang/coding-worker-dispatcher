@@ -98,6 +98,18 @@ bounded worker summary, changed files, Git evidence, limitations and errors.
 `acceptance` remains `unknown`; tests are not independently run by this tool.
 Worker output is data, never authorization to execute another command.
 
+## Codex Skill entry point
+
+The optional [Codex Skill](skills/coding-worker-dispatcher/SKILL.md) lets Codex call
+the dispatcher after you explicitly select DSH or ZCode, then review its structured
+result. Install it in your personal Codex skills directory and keep your checkout
+path and trusted TOML config in private `dispatcher-home.txt` and
+`dispatcher-config.txt` files beside the installed `SKILL.md` (one absolute path
+per file). These local files are not part of this public repository. For example,
+ask Codex: “Use `$coding-worker-dispatcher` with DSH to inspect this Git repository
+in read-only mode, then verify and summarize the result.” The same dispatcher
+config and Git safety checks apply when called from the Skill.
+
 Exit codes: 0 protocol completion/handoff, 2 rejection, 3 failure, 4 timeout,
 130 cancellation. Always inspect Result.status and Result.error as well.
 
